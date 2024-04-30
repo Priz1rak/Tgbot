@@ -75,12 +75,14 @@ def time(message):
             f"Иша: {timings['Isha']}"
         )
         bot.send_message(message.chat.id, prayer_times_text)
+        write_req(prayer_times_text,message.from_user.username)
         print('okkkk')
     else:
         bot.send_message(message.chat.id,
                          f'Извините, {message.from_user.username}, для данного города время намаза пока не доступно')
         print('ne okk')
-        
+
+
 
 
 @bot.message_handler(commands=['help'])
