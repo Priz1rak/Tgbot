@@ -3,7 +3,7 @@ import datetime
 from telebot import types
 import requests
 
-bot = telebot.TeleBot('6998494909:AAFNJDcHu3XNTzf2VPxi6MpYfPTrz8Pc-cE')
+bot = telebot.TeleBot('Token')
 
 city_name = ''
 def write_req(mess, name):
