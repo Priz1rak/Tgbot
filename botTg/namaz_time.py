@@ -6,9 +6,11 @@ import requests
 bot = telebot.TeleBot('Token')
 
 city_name = ''
+
+
 def write_req(mess, name):
     try:
-        with open("text1.txt", "a", encoding='utf8') as file:
+        with open("text1.txt", "a", encoding='utf8') as file:  # добавление времени намаза в файл
             now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             file.write(f"{now}:--{name} -- {mess}\n")
     except Exception as e:
@@ -21,6 +23,7 @@ def start(message):
     btnnamaz = types.InlineKeyboardButton('Время намаза', callback_data='namaz')
     btnkubla = types.InlineKeyboardButton('Местоположение Киблы',
                                           url='https://qiblafinder.withgoogle.com/intl/ru/desktop/finder')
+    # перебрасывание на сайт с определением Киблы
     object1.row(btnnamaz, btnkubla)
     btnlesson = types.InlineKeyboardButton('Научиться совершать Намаз', callback_data='lesson')
     object1.row(btnlesson)
@@ -31,30 +34,30 @@ def start(message):
 @bot.callback_query_handler(func=lambda callback: True)
 def callback_message(callback):
     global city_name
-    object2 = types.InlineKeyboardMarkup()
-    btnmoskow = types.InlineKeyboardButton('Москва', callback_data='Moskow')
+    object2 = types.InlineKeyboardMarkup()  # создание списка кнопок
+    btnmoskow = types.InlineKeyboardButton('Москва', callback_data='Moskow')  # создание кнопок
     btnmakha = types.InlineKeyboardButton('Махачкала', callback_data='Makhachkala')
     btngrozni = types.InlineKeyboardButton('Грозный', callback_data='Grozniy')
     btnrostow = types.InlineKeyboardButton('Ростов-на-Дону', callback_data='Rostow')
     btnkazan = types.InlineKeyboardButton('Казань', callback_data='Kazan')
     btnvoron = types.InlineKeyboardButton('Воронеж', callback_data='Voronezh')
     btnkrasnodar = types.InlineKeyboardButton('Краснодар', callback_data='Krasnodar')
-    object2.row(btnkazan, btnrostow)
+    object2.row(btnkazan, btnrostow)  # добавление кнопок в ячейки 
     object2.row(btngrozni, btnmakha)
     object2.row(btnmoskow, btnvoron)
     object2.row(btnkrasnodar)
 
-    if callback.data == 'namaz':
+    if callback.data == 'namaz':  # проверка выбранной кнопки 
         bot.send_message(callback.message.chat.id,
                          f'Выберите город из списка, либо укажите на английском! (Makhachkala)', reply_markup=object2)
         bot.register_next_step_handler(callback.message, time)
 
     elif callback.data == 'lesson':
-        file = open('Video/namaz.mp4', 'rb')
+        file = open('Video/namaz.mp4', 'rb')  # отправление видео
         bot.send_video(callback.message.chat.id, file)
 
 
-def time(message):
+def time(message):  # действие кнопки 
     global city_name
     city_name = message.text
 
@@ -63,7 +66,7 @@ def time(message):
     response = requests.get(url)
     data = response.json()
 
-    if data["code"] == 200:
+    if data["code"] == 200:  # показ времени для выбранного города
         timings = data["data"]["timings"]
         prayer_times_text = (
             f"Время намаза для {city_name}:\n"
@@ -75,7 +78,7 @@ def time(message):
             f"Иша: {timings['Isha']}"
         )
         bot.send_message(message.chat.id, prayer_times_text)
-        write_req(prayer_times_text,message.from_user.username)
+        write_req(prayer_times_text, message.from_user.username)
         print('okkkk')
     else:
         bot.send_message(message.chat.id,
@@ -83,14 +86,12 @@ def time(message):
         print('ne okk')
 
 
-
-
 @bot.message_handler(commands=['help'])
-def helps(message):
+def helps(message):  # информационный справочник
     bot.send_message(message.chat.id, f'этот бот позволит: \n'
                                       f'1-узнать время намаза по России \n'
                                       f'2-определить местонахождение Киблы🕋 \n'
                                       f'3-научится совершать намаз \n')
 
 
-bot.polling(none_stop=True)
+bot.polling(none_stop=True)  # завершение программы
